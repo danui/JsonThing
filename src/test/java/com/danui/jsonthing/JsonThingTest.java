@@ -25,6 +25,8 @@ import static org.junit.Assert.*;
  * - R1005 asBoolean returns a Boolean
  * - R1006 longValue returns a long
  * - R1007 booleanValue returns a boolean
+ * - R1008 asDouble returns a Double
+ * - R1009 doubleValue returns a double
  *
  * R20xx Navigation using gets.
  *
@@ -209,6 +211,42 @@ public class JsonThingTest {
         assertEquals(Boolean.FALSE, thing.booleanValue());
     }
 
+    // - R1008 asDouble returns a Double
+    //
+    //   a) when value is a Double
+    //   b) when value is a Float
+    //   c) when value is a Long
+    //   d) when value is an Integer
+    //
+    @Test
+    public void test_R1008a() throws Exception {
+        JsonThing thing = JsonThing.wrap(Double.valueOf(11.7));
+        assertTrue(thing.asDouble() instanceof Double);
+    }
+    @Test
+    public void test_R1008b() throws Exception {
+        JsonThing thing = JsonThing.wrap(Float.valueOf(11.7f));
+        assertTrue(thing.asDouble() instanceof Double);
+    }
+    @Test
+    public void test_R1008c() throws Exception {
+        JsonThing thing = JsonThing.wrap(Long.valueOf(12L));
+        assertTrue(thing.asDouble() instanceof Double);
+    }
+    @Test
+    public void test_R1008d() throws Exception {
+        JsonThing thing = JsonThing.wrap(Integer.valueOf(12));
+        assertTrue(thing.asDouble() instanceof Double);
+    }
+
+    // - R1009 doubleValue returns a double
+    //
+    @Test
+    public void test_R1009() throws Exception {
+        JsonThing thing = JsonThing.wrap(Double.MAX_VALUE);
+        assertEquals(Double.MAX_VALUE, thing.doubleValue(), 0.0);
+    }
+
     // - R2001 get(key: String) navigates a Map and returns a JsonThing that
     //   wraps the thing at 'key'.
     //
@@ -244,10 +282,12 @@ public class JsonThingTest {
         data.put("key1", "value1");
         data.put("key2", 200);
         data.put("key3", false);
+        data.put("key4", 3.14);
         JsonThing thing = JsonThing.wrap(data);
         assertEquals("value1", thing.get("key1").asString());
         assertEquals(200L, thing.get("key2").longValue());
         assertEquals(false, thing.get("key3").booleanValue());
+        assertEquals(3.14d, thing.get("key4").doubleValue(), 0.0);
     }
 
     // - R2004 get(idx: int) can work with list values of mixed types.
@@ -258,10 +298,12 @@ public class JsonThingTest {
         data.add("value1");
         data.add(200);
         data.add(false);
+        data.add(3.14);
         JsonThing thing = JsonThing.wrap(data);
         assertEquals("value1", thing.get(0).asString());
         assertEquals(200L, thing.get(1).longValue());
         assertEquals(false, thing.get(2).booleanValue());
+        assertEquals(3.14d, thing.get(3).doubleValue(), 0.0);
     }
 
     // - R3001 is(key: String) returns true if the thing is a map with a true

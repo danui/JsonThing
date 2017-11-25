@@ -47,11 +47,14 @@ public class JsonThing {
     }
 
     public Long asLong() {
+        if (thing == null) {
+            return null;
+        }
         if (thing instanceof Long) {
             return (Long)thing;
         }
         if (thing instanceof Integer) {
-            return Long.valueOf(((Integer)thing).longValue());
+            return ((Integer)thing).longValue();
         }
         throw new IllegalStateException(
             "thing must be Long or Integer, but it is "+
@@ -62,12 +65,35 @@ public class JsonThing {
         return (Boolean)thing;
     }
 
+    public Double asDouble() {
+        if (thing == null) {
+            return null;
+        }
+        if (thing instanceof Double) {
+            return (Double)thing;
+        }
+        if (thing instanceof Float) {
+            return ((Float)thing).doubleValue();
+        }
+        if (thing instanceof Long) {
+            return ((Long)thing).doubleValue();
+        }
+        if (thing instanceof Integer) {
+            return ((Integer)thing).doubleValue();
+        }
+        return (Double)thing;
+    }
+
     public long longValue() {
         return asLong();
     }
 
     public boolean booleanValue() {
         return asBoolean();
+    }
+
+    public double doubleValue() {
+        return asDouble();
     }
 
     public JsonThing get(String key) {
