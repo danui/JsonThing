@@ -65,3 +65,15 @@ First we make a JsonThing.
 Then we call asMap to cast its underlying object to a Map.
 
     Map<String,Object> employeeData = employee.asMap();
+
+Or all at once...
+
+    Map<String,Object> employeeData = JsonThing.newMap()
+        .put("name", "Alice")
+        .put("badge_number", 107)
+        .put("district_ids", JsonThing.newList()
+            .add(310)
+            .add(309)
+            .add(308))
+        .put("active", false)
+        .asMap();
