@@ -1,7 +1,5 @@
 # JsonThing
 
-Java utility for reading and writing "JSON things" such as Map and List.
-
 Most libraries that work with JSON define polymorphic data types such as
 JsonObject, JsonArray, JsonNumber, etc.  I think we can simplify that by
 having just a single JsonThing.  Whatever type a thing may be.  Okay
@@ -24,22 +22,36 @@ into a Map.
         "active": false
     }
 
-Wrapping...
+Then to read it we can just wrap the map using `JsonThing::wrap`.
 
     Map<String,Object> employeeData = ...; // from Jackson
     JsonThing employee = JsonThing.wrap(employeeData);
 
-Reading...
+Values are then read using `get(String)` or `get(int)` to navigate and
+various type casting methods (e.g. `asString`, `longValue` etc.) to read
+the value.
+
+Reading name and badge number...
 
     assertEquals("Alice", employee.get("name").asString());
     assertEquals(107L, employee.get("badge_number").longValue());
+
+Reading district IDs from an array...
+
     assertEquals(310L, employee.get("district_ids").get(0).longValue());
     assertEquals(309L, employee.get("district_ids").get(1).longValue());
     assertEquals(308L, employee.get("district_ids").get(2).longValue());
-    assertFalse(employee.is("active"));
+
+Reading a boolean...
+
     assertFalse(employee.get("active").booleanValue());
 
+A shorthand for reading booleans...
+
+    assertFalse(employee.is("active"));
+
 We can also use JsonThing to create such maps in a very fluent manner.
+First we make a JsonThing.
 
     JsonThing employee = JsonThing.newMap()
         .put("name", "Alice")
@@ -50,6 +62,6 @@ We can also use JsonThing to create such maps in a very fluent manner.
             .add(308))
         .put("active", false);
 
-The above leaves us with a JsonThing. To get a Map map, just call asMap.
+Then we call asMap to cast its underlying object to a Map.
 
     Map<String,Object> employeeData = employee.asMap();
