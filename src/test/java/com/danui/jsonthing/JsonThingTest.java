@@ -38,10 +38,22 @@ import static org.junit.Assert.*;
  *
  * - R2004 get(idx: int) can work with list values of mixed types.
  *
- * R30xx Others
+ * R30xx is()
  *
  * - R3001 is(key: String) returns true if the thing is a map with a true
  *   boolean at key. is(key: String) should return false otherwise.
+ *
+ * R40xx add() and put()
+ *
+ * - R4001 add(value: Object) assumes that the wrapped thing is a list and then
+ *   appends value to that list. If value is another JsonThing, then the thing
+ *   that value wraps would be added instead.
+ *
+ * - R4002 put(key: String, value: Object) assumes that the wrapped thing is a
+ *   map and then puts value into that map at key. If value is another
+ *   JsonThing, then the thing that value wraps would be inserted into the map
+ *   instead.
+ *
  *
  * @author Jin
  */
@@ -268,5 +280,34 @@ public class JsonThingTest {
         assertTrue("true if boolean at key is true", thing.is("red"));
         assertFalse("false if boolean at key is false", thing.is("blue"));
         assertFalse("false if no value at key", thing.is("green"));
+    }
+
+    // - R4001 add(value: Object) assumes that the wrapped thing is a list and
+    //   then appends value to that list. If value is another JsonThing, then
+    //   the thing that value wraps would be added instead.
+    //
+    @Test
+    public void test_R4001() throws Exception {
+        List<Object> list = JsonThing.newList()
+            .add("apple")
+            .add(JsonThing.wrap("orange"))
+            .asList();
+        assertEquals("apple", (String)list.get(0));
+        assertEquals("orange", (String)list.get(1));
+    }
+
+    // - R4002 put(key: String, value: Object) assumes that the wrapped thing is
+    //   a map and then puts value into that map at key. If value is another
+    //   JsonThing, then the thing that value wraps would be inserted into the
+    //   map instead.
+    //
+    @Test
+    public void test_R4002() throws Exception {
+        Map<String,Object> map = JsonThing.newMap()
+            .put("key1", "apple")
+            .put("key2", JsonThing.wrap("orange"))
+            .asMap();
+        assertEquals("apple", (String)map.get("key1"));
+        assertEquals("orange", (String)map.get("key2"));
     }
 }
