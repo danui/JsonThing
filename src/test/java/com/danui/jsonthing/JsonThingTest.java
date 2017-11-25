@@ -34,6 +34,10 @@ import static org.junit.Assert.*;
  * - R2002 get(idx: int) navigates a List and returns a JsonThing that wraps the
  *   idx'th element in the list.
  *
+ * - R2003 get(key: String) can work with map values of mixed types.
+ *
+ * - R2004 get(idx: int) can work with list values of mixed types.
+ *
  * R30xx Others
  *
  * - R3001 is(key: String) returns true if the thing is a map with a true
@@ -218,6 +222,34 @@ public class JsonThingTest {
         assertEquals("value1", thing.get(0).asString());
         assertEquals("value2", thing.get(1).asString());
         assertEquals("value3", thing.get(2).asString());
+    }
+
+    // - R2003 get(key: String) can work with map values of mixed types.
+    //
+    @Test
+    public void test_R2003() throws Exception {
+        Map<String,Object> data = new HashMap<>();
+        data.put("key1", "value1");
+        data.put("key2", 200);
+        data.put("key3", false);
+        JsonThing thing = JsonThing.wrap(data);
+        assertEquals("value1", thing.get("key1").asString());
+        assertEquals(200L, thing.get("key2").longValue());
+        assertEquals(false, thing.get("key3").booleanValue());
+    }
+
+    // - R2004 get(idx: int) can work with list values of mixed types.
+    //
+    @Test
+    public void test_R2004() throws Exception {
+        List<Object> data = new ArrayList<>();
+        data.add("value1");
+        data.add(200);
+        data.add(false);
+        JsonThing thing = JsonThing.wrap(data);
+        assertEquals("value1", thing.get(0).asString());
+        assertEquals(200L, thing.get(1).longValue());
+        assertEquals(false, thing.get(2).booleanValue());
     }
 
     // - R3001 is(key: String) returns true if the thing is a map with a true
