@@ -1,79 +1,76 @@
 # JsonThing
 
-Most libraries that work with JSON define polymorphic data types such as
-JsonObject, JsonArray, JsonNumber, etc.  I think we can simplify that by
-having just a single JsonThing.  Whatever type a thing may be.  Okay
-maybe it is not that flexible.  JsonThing is a reader for JSON strings
-that have been expressed into Map and List form where...
+A utility for working with JSON strings.
 
-- JSON Object is a `Map<String,Object>`
-- JSON Array is a `List<Object>`
-- JSON String is a `String`
-- JSON Number is a `Long` or `Double`
-- JSON Boolean is a `Boolean`
+## Building JSON objects using JsonThing
 
-Suppose that we have used Jackson to transform the following JSON string
-into a Map.
+In this example the objective is to create a JSON object with the
+following structure.
 
     {
         "name": "Alice",
         "badge_number": 107,
+        "active": false,
         "district_ids": [310, 309, 308],
-        "active": false
+        "accuracy": 83.128
     }
 
-Then to read it we can just wrap the map using `JsonThing::wrap`.
+JsonThing provides a fluent interface that enables a natural approach
+for constructing arbitrary JSON object structures. The above structure
+would be created as follows.
 
-    Map<String,Object> employeeData = ...; // from Jackson
-    JsonThing employee = JsonThing.wrap(employeeData);
-
-Values are then read using `get(String)` or `get(int)` to navigate and
-various type casting methods (e.g. `asString`, `longValue` etc.) to read
-the value.
-
-Reading name and badge number...
-
-    assertEquals("Alice", employee.get("name").asString());
-    assertEquals(107L, employee.get("badge_number").longValue());
-
-Reading district IDs from an array...
-
-    assertEquals(310L, employee.get("district_ids").get(0).longValue());
-    assertEquals(309L, employee.get("district_ids").get(1).longValue());
-    assertEquals(308L, employee.get("district_ids").get(2).longValue());
-
-Reading a boolean...
-
-    assertFalse(employee.get("active").booleanValue());
-
-A shorthand for reading booleans...
-
-    assertFalse(employee.is("active"));
-
-We can also use JsonThing to create such maps in a very fluent manner.
-First we make a JsonThing.
-
-    JsonThing employee = JsonThing.newMap()
+    JsonThing obj = JsonThing.newMap()
         .put("name", "Alice")
         .put("badge_number", 107)
-        .put("district_ids", JsonThing.newList()
-            .add(310)
-            .add(309)
-            .add(308))
-        .put("active", false);
-
-Then we call asMap to cast its underlying object to a Map.
-
-    Map<String,Object> employeeData = employee.asMap();
-
-Or all at once...
-
-    Map<String,Object> employeeData = JsonThing.newMap()
-        .put("name", "Alice")
-        .put("badge_number", 107)
-        .put("district_ids", JsonThing.newList()
-            .add(310)
-            .add(309)
-            .add(308))
         .put("active", false)
-        .asMap();
+        .put("district_ids", JsonThing.newList()
+            .add(310)
+            .add(309)
+            .add(308))
+        .put("accuracy", 83.128);
+
+## Accessing values of a JsonThing
+
+Assuming that a JsonThing was constructed with the following structure.
+
+    {
+        "name": "Alice",
+        "badge_number": 107,
+        "active": false,
+        "district_ids": [310, 309, 308],
+        "accuracy": 83.128
+    }
+
+The following assertions show how individual property values can be
+read.
+
+    assertEquals("Alice", obj.get("name").asString());
+    assertEquals(107L, obj.get("badge_number").longValue());
+    assertFalse(obj.get("active").booleanValue());
+    assertFalse(obj.is("active"));
+    assertEquals(310L, obj.get("district_ids").get(0).longValue());
+    assertEquals(309L, obj.get("district_ids").get(1).longValue());
+    assertEquals(308L, obj.get("district_ids").get(2).longValue());
+    assertEquals(83.128d, obj.get("accuracy").doubleValue(), 0.00001);
+
+## Encoding JsonThing to JSON string
+
+Given a JsonThing object `obj`, the following encodes `obj` into a JSON
+string `s`.
+
+    try {
+        s = obj.toJson();
+    } catch (IOException e) {
+        // Failed to encode.
+    }
+
+## Parsing JSON string to JsonThing
+
+Given a JSON string `s`, the following parses `s` into a JsonThing
+`obj`.
+
+    try {
+        JsonThing obj = JsonThing.parse(s);
+    } catch (IOException e) {
+        // Failed to parse.
+    }
