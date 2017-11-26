@@ -1,5 +1,7 @@
 package com.danui.jsonthing;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,8 +14,15 @@ import java.util.stream.Collectors;
  * @author Jin
  */
 public class JsonThing {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
     public static JsonThing wrap(Object thing) {
         return new JsonThing(thing);
+    }
+
+    public static JsonThing parse(String jsonString) throws IOException {
+        return wrap(MAPPER.readValue(jsonString, Map.class));
     }
 
     public static JsonThing newMap() {
@@ -131,4 +140,7 @@ public class JsonThing {
         return this;
     }
 
+    public String toJson() throws IOException {
+        return MAPPER.writeValueAsString(thing);
+    }
 }

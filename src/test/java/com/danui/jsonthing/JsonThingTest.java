@@ -72,6 +72,13 @@ import static org.junit.Assert.*;
  *   JsonThing, then the thing that value wraps would be inserted into the map
  *   instead.
  *
+ * R50xx JSON parsing and encoding
+ *
+ * - R5001 JsonThing::parse parses a JSON string into a JsonThing.
+ *
+ * - R5002 JsonThing::toJson returns the JsonThing as a JSON string.
+ *
+ * - R5003 JsonThing::toString is not the same as toJson.
  *
  * @author Jin
  */
@@ -437,4 +444,137 @@ public class JsonThingTest {
         assertEquals("apple", (String)map.get("key1"));
         assertEquals("orange", (String)map.get("key2"));
     }
+
+    // - R5001 JsonThing::parse parses a JSON string into a JsonThing.
+    //
+    @Test
+    public void test_R5001a() throws Exception {
+        assertEquals("Empty object", 0, JsonThing.parse("{}").asMap().size());
+    }
+    @Test
+    public void test_R5001b() throws Exception {
+        assertEquals("Object with one string property",
+            "value1",
+            JsonThing.parse("{\"key1\":\"value1\"}").get("key1").asString());
+    }
+    @Test
+    public void test_R5001c() throws Exception {
+        assertEquals("Object with one integer property",
+            12345L,
+            JsonThing.parse("{\"key1\":12345}").get("key1").longValue());
+    }
+    @Test
+    public void test_R5001d() throws Exception {
+        assertEquals("Object with one floating point property",
+            12.345d,
+            JsonThing.parse("{\"key1\":12.345}").get("key1").doubleValue(),
+            0.0001);
+    }
+    @Test
+    public void test_R5001e() throws Exception {
+        assertEquals("Object with one boolean property",
+            false,
+            JsonThing.parse("{\"key1\":false}").get("key1").booleanValue());
+    }
+    @Test
+    public void test_R5001f() throws Exception {
+        JsonThing obj = JsonThing.parse(
+            "{\"values\":[\"a string\",100,12.345,false,{\"x\":1,\"y\":2}]}");
+        assertEquals(
+            "obj.values[0] is a string",
+            "a string",
+            obj.get("values").get(0).asString());
+        assertEquals(
+            "obj.values[1] is 100",
+            100L,
+            obj.get("values").get(1).longValue());
+        assertEquals(
+            "obj.values[2] is 12.345",
+            12.345d,
+            obj.get("values").get(2).doubleValue(),
+            0.0001);
+        assertEquals(
+            "obj.values[3] is false",
+            false,
+            obj.get("values").get(3).booleanValue());
+        assertEquals(
+            "obj.values[4].x is 1",
+            1L,
+            obj.get("values").get(4).get("x").longValue());
+        assertEquals(
+            "obj.values[4].y is 2",
+            2L,
+            obj.get("values").get(4).get("y").longValue());
+    }
+
+    // - R5002 JsonThing::toJson returns the JsonThing as a JSON string.
+    //
+    @Test
+    public void test_R5002a() throws Exception {
+        assertEquals("Empty object", "{}", JsonThing.newMap().toJson());
+    }
+    @Test
+    public void test_R5002b() throws Exception {
+        assertEquals("Object with one string property",
+            "{\"key1\":\"value1\"}",
+            JsonThing.newMap().put("key1", "value1").toJson());
+    }
+    @Test
+    public void test_R5002f() throws Exception {
+        JsonThing obj = JsonThing.parse(
+            JsonThing.newMap()
+                .put("values", JsonThing.newList()
+                    .add("a string")
+                    .add(100)
+                    .add(12.345)
+                    .add(false)
+                    .add(JsonThing.newMap()
+                        .put("x", 1)
+                        .put("y", 2)))
+                .toJson());
+        assertEquals(
+            "obj.values[0] is a string",
+            "a string",
+            obj.get("values").get(0).asString());
+        assertEquals(
+            "obj.values[1] is 100",
+            100L,
+            obj.get("values").get(1).longValue());
+        assertEquals(
+            "obj.values[2] is 12.345",
+            12.345d,
+            obj.get("values").get(2).doubleValue(),
+            0.0001);
+        assertEquals(
+            "obj.values[3] is false",
+            false,
+            obj.get("values").get(3).booleanValue());
+        assertEquals(
+            "obj.values[4].x is 1",
+            1L,
+            obj.get("values").get(4).get("x").longValue());
+        assertEquals(
+            "obj.values[4].y is 2",
+            2L,
+            obj.get("values").get(4).get("y").longValue());
+    }
+
+    // - R5003 JsonThing::toString is not the same as toJson.
+    //
+    @Test
+    public void test_R5003() throws Exception {
+        JsonThing obj = JsonThing.newMap()
+                .put("values", JsonThing.newList()
+                    .add("a string")
+                    .add(100)
+                    .add(12.345)
+                    .add(false)
+                    .add(JsonThing.newMap()
+                        .put("x", 1)
+                        .put("y", 2)));
+        assertNotEquals(obj.toString(), obj.toJson());
+        // System.out.println(obj.toString());
+        // System.out.println(obj.toJson());
+   }
+
 }
