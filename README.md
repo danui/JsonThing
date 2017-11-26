@@ -74,3 +74,8 @@ Given a JSON string `s`, the following parses `s` into a JsonThing
     } catch (IOException e) {
         // Failed to parse.
     }
+
+## Specification
+
+The definitive specification is provided by the unit test
+[`JsonThingTest.java`](src/test/java/com/danui/jsonthing/JsonThingTest.java)
