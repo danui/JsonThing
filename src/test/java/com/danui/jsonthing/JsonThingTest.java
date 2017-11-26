@@ -28,6 +28,22 @@ import static org.junit.Assert.*;
  * - R1008 asDouble returns a Double
  * - R1009 doubleValue returns a double
  *
+ * R11xx Requirements for ClassCastException.
+ *
+ * - R1101 asMap throws ClassCastException if the thing is not a Map.
+ * - R1102 asList throws ClassCastException if the thing is not a List.
+ * - R1103 asString throws ClassCastException if the thing is not a String.
+ * - R1104 asLong throws ClassCastException if the thing is not a Long or an
+ *   Integer.
+ * - R1105 asBoolean throws ClassCastException if the thing is not a Boolean.
+ * - R1106 asDouble throws ClassCastException if the thing is not a Double,
+ *   Float, Long, or Integer.
+ * - R1107 longValue throws ClassCastException if the thing is not a Long or an
+ *   Integer.
+ * - R1108 doubleValue throws ClassCastException if the thing is not a Double,
+ *   Float, Long, or Integer.
+ * - R1109 booleanValue throws ClassCastException if the thing is not a Boolean.
+ *
  * R20xx Navigation using gets.
  *
  * - R2001 get(key: String) navigates a Map and returns a JsonThing that wraps
@@ -245,6 +261,75 @@ public class JsonThingTest {
     public void test_R1009() throws Exception {
         JsonThing thing = JsonThing.wrap(Double.MAX_VALUE);
         assertEquals(Double.MAX_VALUE, thing.doubleValue(), 0.0);
+    }
+
+    // - R1101 asMap throws ClassCastException if the thing is not a Map.
+    //
+    @Test(expected=ClassCastException.class)
+    public void test_R1101() throws Exception {
+        JsonThing.wrap("Map").asMap();
+    }
+
+    // - R1102 asList throws ClassCastException if the thing is not a List.
+    //
+    @Test(expected=ClassCastException.class)
+    public void test_R1102() throws Exception {
+        JsonThing.wrap("List").asList();
+    }
+
+    // - R1103 asString throws ClassCastException if the thing is not a String.
+    //
+    @Test(expected=ClassCastException.class)
+    public void test_R1103() throws Exception {
+        JsonThing.wrap(100).asList();
+    }
+
+    // - R1104 asLong throws ClassCastException if the thing is not a Long or an
+    //   Integer.
+    //
+    @Test(expected=ClassCastException.class)
+    public void test_R1104() throws Exception {
+        JsonThing.wrap("Long").asLong();
+    }
+
+    // - R1105 asBoolean throws ClassCastException if the thing is not a
+    //   Boolean.
+    //
+    @Test(expected=ClassCastException.class)
+    public void test_R1105() throws Exception {
+        JsonThing.wrap("Boolean").asBoolean();
+    }
+
+    // - R1106 asDouble throws ClassCastException if the thing is not a Double,
+    //   Float, Long, or Integer.
+    //
+    @Test(expected=ClassCastException.class)
+    public void test_R1106() throws Exception {
+        JsonThing.wrap("Double").asDouble();
+    }
+
+    // - R1107 longValue throws ClassCastException if the thing is not a Long or
+    //   an Integer.
+    //
+    @Test(expected=ClassCastException.class)
+    public void test_R1107() throws Exception {
+        JsonThing.wrap("long").longValue();
+    }
+
+    // - R1108 doubleValue throws ClassCastException if the thing is not a
+    //   Double, Float, Long, or Integer.
+    //
+    @Test(expected=ClassCastException.class)
+    public void test_R1108() throws Exception {
+        JsonThing.wrap("double").doubleValue();
+    }
+
+    // - R1109 booleanValue throws ClassCastException if the thing is not a
+    //   Boolean.
+    //
+    @Test(expected=ClassCastException.class)
+    public void test_R1109() throws Exception {
+        JsonThing.wrap("true").booleanValue();
     }
 
     // - R2001 get(key: String) navigates a Map and returns a JsonThing that
